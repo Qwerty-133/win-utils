@@ -15,6 +15,6 @@ asyncio.run(
     toast.show_toast(
         "Mouse buttons swapped",
         f"The primary mouse button is now the {new_state_repr} button.",
-        toast.get_icon("cursor.ico")
+        toast.get_icon(ICON_NAME)
     )
 )
