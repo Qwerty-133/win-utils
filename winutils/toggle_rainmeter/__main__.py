@@ -5,6 +5,7 @@ import contextlib
 import subprocess
 import asyncio
 from winutils._helpers import toast
+from winutils._helpers import ini
 
 SKIN_PATH = platformdirs.user_documents_path() / "Rainmeter" / "Skins"
 MOND_PATH = SKIN_PATH / "Mond" / "@Resources" / "Variables.inc"
@@ -15,18 +16,6 @@ RAINMETER_EXECUTABLE = pathlib.Path(
 ICON_NAME = "water-drop.ico"
 
 is_white = False
-
-
-@contextlib.contextmanager
-def edit_config(path: pathlib.Path):
-    """Context manager for opening and writing configs."""
-    config = configparser.ConfigParser()
-    config.read(path)
-
-    yield config
-
-    with open(path, "w") as configfile:
-        config.write(configfile)
 
 
 def toggle_mond(config: configparser.ConfigParser):
@@ -65,7 +54,7 @@ SKINS = [
 ]
 
 for path, toggle in SKINS:
-    with edit_config(path) as config:
+    with ini.edit_config(path) as config:
         toggle(config)
 
 refresh_skins()
