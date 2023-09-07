@@ -1,18 +1,14 @@
 import configparser
 import pathlib
 import platformdirs
-import contextlib
 import subprocess
-import asyncio
 from winutils._helpers import toast
 from winutils._helpers import ini
 
 SKIN_PATH = platformdirs.user_documents_path() / "Rainmeter" / "Skins"
 MOND_PATH = SKIN_PATH / "Mond" / "@Resources" / "Variables.inc"
 CLEARTEXT_PATH = SKIN_PATH / "Cleartext" / "@Resources" / "color.inc"
-RAINMETER_EXECUTABLE = pathlib.Path(
-    "C:/", "Program Files", "Rainmeter", "Rainmeter.exe"
-)
+RAINMETER_EXECUTABLE = pathlib.Path("C:/", "Program Files", "Rainmeter", "Rainmeter.exe")
 ICON_NAME = "water-drop.ico"
 
 is_white = False
@@ -60,10 +56,10 @@ for path, toggle in SKINS:
 refresh_skins()
 
 current_theme = "white" if is_white else "black"
-asyncio.run(
-    toast.show_toast(
-        "Rainmeter",
-        f"Toggled skin colours, currently {current_theme}.",
-        icon=toast.get_icon(ICON_NAME),
-    )
+toast.show_toast(
+    "Rainmeter",
+    f"Toggled skin colours, currently {current_theme}.",
+    toast.get_icon(ICON_NAME),
+    "Toggle Rainmeter",
 )
+toast.wait_for_toast_completion()

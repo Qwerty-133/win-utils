@@ -14,7 +14,7 @@ FN_KEY_MAPPING = {
     keyboard.Key.f8: keyboard.Key.media_next,
     keyboard.Key.f10: keyboard.Key.media_volume_down,
     keyboard.Key.f11: keyboard.Key.media_volume_up,
-    keyboard.Key.f12: keyboard.Key.media_volume_mute
+    keyboard.Key.f12: keyboard.Key.media_volume_mute,
 }
 
 
@@ -23,10 +23,7 @@ def toggle_enabled():
     enabled = not enabled
     status = "enabled" if enabled else "disabled"
     asyncio.run(
-        toast.show_toast(
-            f"Fn-lock toggled. Currently: {status}",
-            toast.get_icon(ICON_NAME)
-        )
+        toast.show_toast(f"Fn-lock toggled. Currently: {status}", toast.get_icon(ICON_NAME))
     )
     print(status)
 
@@ -37,7 +34,7 @@ def on_press(key):
         return
 
     if key in FN_KEY_MAPPING:
-        print('pressing')
+        print("pressing")
         controller.tap(FN_KEY_MAPPING[key])
         return 1
 
@@ -46,9 +43,6 @@ def on_release(key):
     hotkey.release(listener.canonical(key))
 
 
-hotkey = keyboard.HotKey(
-    keyboard.HotKey.parse(HOTKEY),
-    toggle_enabled
-)
+hotkey = keyboard.HotKey(keyboard.HotKey.parse(HOTKEY), toggle_enabled)
 with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
     listener.join()
