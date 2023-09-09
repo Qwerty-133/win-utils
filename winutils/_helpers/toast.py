@@ -12,17 +12,30 @@ def get_icon(icon_name):
     """Generate the dict for a given icon."""
     icon_path = ICON_DIR / icon_name
     assert icon_path.exists()
-    return {"src": icon_path.as_uri(), "placement": "appLogoOverride"}
+    return {
+        "src": icon_path.as_uri(),
+        "placement": "appLogoOverride",
+    }
 
 
-def show_toast(title, body, icon=None, app_id=win11toast.DEFAULT_APP_ID):
+def show_toast(
+    title,
+    body,
+    icon=None,
+    app_id=win11toast.DEFAULT_APP_ID,
+):
     """Show a toast notification."""
     global toast_future
     if toast_future:
         toast_future.cancel()
 
     toast_future = asyncio.run_coroutine_threadsafe(
-        win11toast.toast_async(title, body, icon=icon, app_id=app_id),
+        win11toast.toast_async(
+            title,
+            body,
+            icon=icon,
+            app_id=app_id,
+        ),
         loop,
     )
 

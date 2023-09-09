@@ -23,7 +23,10 @@ def toggle_enabled():
     enabled = not enabled
     status = "enabled" if enabled else "disabled"
     asyncio.run(
-        toast.show_toast(f"Fn-lock toggled. Currently: {status}", toast.get_icon(ICON_NAME))
+        toast.show_toast(
+            f"Fn-lock toggled. Currently: {status}",
+            toast.get_icon(ICON_NAME),
+        )
     )
     print(status)
 
