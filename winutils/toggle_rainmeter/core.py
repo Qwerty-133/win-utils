@@ -9,18 +9,11 @@ from winutils._helpers import ini
 SKIN_PATH = platformdirs.user_documents_path() / "Rainmeter" / "Skins"
 MOND_PATH = SKIN_PATH / "Mond" / "@Resources" / "Variables.inc"
 CLEARTEXT_PATH = SKIN_PATH / "Cleartext" / "@Resources" / "color.inc"
-RAINMETER_EXECUTABLE = pathlib.Path(
-    "C:/",
-    "Program Files",
-    "Rainmeter",
-    "Rainmeter.exe",
-)
+RAINMETER_EXECUTABLE = pathlib.Path("C:/", "Program Files", "Rainmeter", "Rainmeter.exe")
 ICON_NAME = "water-drop.ico"
 
 
-def is_mond_white(
-    config: configparser.ConfigParser,
-):
+def is_mond_white(config: configparser.ConfigParser):
     """
     Return whether the current colour being used for the skin is white.
 
@@ -30,9 +23,7 @@ def is_mond_white(
     return colour == "255,255,255"
 
 
-def toggle_mond(
-    config: configparser.ConfigParser,
-):
+def toggle_mond(config: configparser.ConfigParser):
     """Toggle Mond skin and update the global variable."""
     current = config["Variables"]["color1"]
     if current == "0,0,0":
@@ -41,9 +32,7 @@ def toggle_mond(
         config["Variables"]["color1"] = "0,0,0"
 
 
-def toggle_cleartext(
-    config: configparser.ConfigParser,
-):
+def toggle_cleartext(config: configparser.ConfigParser):
     """Toggle Cleartext skin."""
 
     current = config["Variables"]["color_opaque"]
@@ -60,10 +49,7 @@ def refresh_skins():
     subprocess.run([RAINMETER_EXECUTABLE, "!Refresh"])
 
 
-SKINS = [
-    (MOND_PATH, toggle_mond),
-    (CLEARTEXT_PATH, toggle_cleartext),
-]
+SKINS = [(MOND_PATH, toggle_mond), (CLEARTEXT_PATH, toggle_cleartext)]
 
 
 def toggle_colours() -> bool:

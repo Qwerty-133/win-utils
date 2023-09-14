@@ -34,10 +34,7 @@ def toggle_enabled():
     State.enabled = not State.enabled
     status = "enabled" if State.enabled else "disabled"
     toast.show_toast(
-        "Fn-lock toggled.",
-        f"Fn-lock is currently {status}.",
-        toast.get_icon(ICON_NAME),
-        "Fn Lock",
+        "Fn-lock toggled.", f"Fn-lock is currently {status}.", toast.get_icon(ICON_NAME), "Fn Lock"
     )
 
 
