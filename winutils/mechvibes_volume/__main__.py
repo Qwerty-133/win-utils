@@ -11,8 +11,12 @@ class Hotkeys:
 
 def register_hotkeys() -> None:
     """Register the hotkeys for increasing/decreasing the scaling."""
-    Hotkeys.increase = keyboard.add_hotkey(core.INCREASE_HOTKEY, core.Handler.increment_scaling)
-    Hotkeys.decrease = keyboard.add_hotkey(core.DECREASE_HOTKEY, core.Handler.decrement_scaling)
+    Hotkeys.increase = keyboard.add_hotkey(
+        core.INCREASE_HOTKEY, core.Handler.increment_scaling, suppress=True
+    )
+    Hotkeys.decrease = keyboard.add_hotkey(
+        core.DECREASE_HOTKEY, core.Handler.decrement_scaling, suppress=True
+    )
 
 
 def unregister_hotkeys() -> None:

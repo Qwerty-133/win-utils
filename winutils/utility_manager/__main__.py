@@ -1,6 +1,6 @@
 import sys
 
-if getattr(sys, "frozen", True):
+if getattr(sys, "frozen", False):
     import psutil
     import os
 
@@ -18,6 +18,7 @@ import platformdirs
 from winutils.fn_lock import core as fn_core
 from winutils.toggle_rainmeter import core as rain_core
 from winutils.toggle_click import core as click_core
+from winutils.mechvibes_volume import core as mech_core
 from winutils._helpers import path
 from PIL import Image
 
@@ -53,6 +54,8 @@ class Hooks:
     fn_hook = None
     click_hotkey = None
     rain_hotkey = None
+    increase_mech_hotkey = None
+    decrease_mech_hotkey = None
 
 
 def change_key_supression(unhook_previous: bool = True) -> None:
@@ -74,21 +77,40 @@ def change_key_supression(unhook_previous: bool = True) -> None:
         Hooks.click_hotkey = None
         keyboard.remove_hotkey(Hooks.rain_hotkey)
         Hooks.rain_hotkey = None
+        keyboard.remove_hotkey(Hooks.increase_mech_hotkey)
+        Hooks.increase_mech_hotkey = None
+        keyboard.remove_hotkey(Hooks.decrease_mech_hotkey)
+        Hooks.decrease_mech_hotkey = None
     if settings["suppressive_key_events"]:
         Hooks.click_hotkey = keyboard.add_hotkey(CLICK_HOTKEY, invoke_click)
         Hooks.rain_hotkey = keyboard.add_hotkey(RAIN_HOTKEY, invoke_rainmeter)
+        Hooks.increase_mech_hotkey = keyboard.add_hotkey(
+            mech_core.INCREASE_HOTKEY, mech_core.Handler.increment_scaling
+        )
+        Hooks.decrease_mech_hotkey = keyboard.add_hotkey(
+            mech_core.DECREASE_HOTKEY, mech_core.Handler.decrement_scaling
+        )
     else:
         Hooks.fn_hook = keyboard.hook(fn_core.handle_events, suppress=True)
         Hooks.click_hotkey = keyboard.add_hotkey(CLICK_HOTKEY, invoke_click, suppress=True)
         Hooks.rain_hotkey = keyboard.add_hotkey(RAIN_HOTKEY, invoke_rainmeter, suppress=True)
+        Hooks.increase_mech_hotkey = keyboard.add_hotkey(
+            mech_core.INCREASE_HOTKEY, mech_core.Handler.increment_scaling, suppress=True
+        )
+        Hooks.decrease_mech_hotkey = keyboard.add_hotkey(
+            mech_core.DECREASE_HOTKEY, mech_core.Handler.decrement_scaling, suppress=True
+        )
 
     SETTINGS_PATH.write_text(json.dumps(settings))
 
 
 CONFIG_PATH.mkdir(parents=True, exist_ok=True)
 SETTINGS_PATH.touch(exist_ok=True)
+
 original_toggle_enabled = fn_core.toggle_enabled
 fn_core.toggle_enabled = toggle_enabled
+
+mech_core.Handler.start()
 
 settings_string = SETTINGS_PATH.read_text()
 if settings_string:
