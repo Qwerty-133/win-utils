@@ -1,13 +1,33 @@
+import threading
+import bisect
+import functools
+import typing as t
 from comtypes import CLSCTX_ALL, COMObject
 from pycaw.pycaw import IAudioEndpointVolume, IAudioEndpointVolumeCallback
 from pycaw.callbacks import MMNotificationClient
 from pycaw.utils import AudioUtilities
-import threading
-import functools
-import typing as t
 
-
-DEBUGGING = True
+DEBUGGING = False
+VOLUME_MAPPING = {
+    0: 100,
+    10: 100,
+    20: 68,
+    30: 34,
+    40: 24,
+    50: 16,
+    60: 12,
+    70: 10,
+    80: 8,
+    90: 6,
+    100: 5,
+}
+SYSTEM_VOLUMES = list(VOLUME_MAPPING.keys())
+APP_VOLUMES = list(VOLUME_MAPPING.values())
+INCREASE_HOTKEY = "ctrl+shift+alt+up"
+DECREASE_HOTKEY = "ctrl+shift+alt+down"
+MIN_SCALE_FACTOR = 0.1
+MAX_SCALE_FACTOR = 2
+SCALE_FACTOR_STEP = 0.1
 
 
 def debounce(callback: t.Callable, fire_after: int) -> t.Callable:
@@ -45,10 +65,31 @@ class Handler:
     devices: t.Any
     interface: t.Any
     volume: t.Any
-    app_volume: int = None
+    notif_client: t.Any
+    enumerator: t.Any
+    app_volume: t.Optional[int] = None
     session: t.Any = None
-    state_refresh_count: int = 0
-    adjust_app_volume_count: int = 0
+    state_refresh_count = 0
+    adjust_app_volume_count = 0
+    scale_factor: float = 1
+
+    @staticmethod
+    def increment_scaling() -> None:
+        """Increment the scaling factor by 1 step."""
+        Handler.scale_factor += SCALE_FACTOR_STEP
+        Handler.scale_factor = max(MIN_SCALE_FACTOR, min(MAX_SCALE_FACTOR, Handler.scale_factor))
+        if DEBUGGING:
+            print(f"Incremented scaling factor to {Handler.scale_factor}")
+        Handler.adjust_app_volume()
+
+    @staticmethod
+    def decrement_scaling() -> None:
+        """Decrement the scaling factor by 1 step."""
+        Handler.scale_factor -= SCALE_FACTOR_STEP
+        Handler.scale_factor = max(MIN_SCALE_FACTOR, min(MAX_SCALE_FACTOR, Handler.scale_factor))
+        if DEBUGGING:
+            print(f"Decremented scaling factor to {Handler.scale_factor}")
+        Handler.adjust_app_volume()
 
     @staticmethod
     def refresh_state() -> None:
@@ -64,8 +105,35 @@ class Handler:
         Handler.devices = AudioUtilities.GetSpeakers()
         Handler.interface = Handler.devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
         Handler.volume = Handler.interface.QueryInterface(IAudioEndpointVolume)
+        # Uncomment the next line to also register volume change notifiers (should be unnecessary)
         # Handler.volume.RegisterControlChangeNotify(AudioEndpointVolumeCallback())
         Handler.adjust_app_volume()
+
+    def get_appropriate_app_volume(system_volume: float) -> float:
+        """
+        Get the appropriate app volume based on the system volume.
+
+        This function linerally interpolates the current system volume.
+        This function accounts for the current scale factor being used.
+        """
+        system_volume = round(system_volume * 100)
+        index = bisect.bisect_left(SYSTEM_VOLUMES, system_volume)
+        if index == 0:
+            l_app_vol = 0
+            l_sys_vol = 0
+        else:
+            l_app_vol = APP_VOLUMES[index - 1]
+            l_sys_vol = SYSTEM_VOLUMES[index - 1]
+
+        u_app_vol = APP_VOLUMES[index]
+        u_sys_vol = SYSTEM_VOLUMES[index]
+
+        app_vol_diff = u_app_vol - l_app_vol
+        sys_vol_diff = u_sys_vol - l_sys_vol
+        app_volume = l_app_vol + (system_volume - l_sys_vol) * app_vol_diff / sys_vol_diff
+
+        scaled_volume = max(0, min(100, app_volume * Handler.scale_factor))
+        return scaled_volume / 100
 
     @staticmethod
     def adjust_app_volume() -> None:
@@ -92,18 +160,36 @@ class Handler:
             if system_volume == 0:
                 return
 
-            new_volume = 1 - system_volume
-            if Handler.app_volume != new_volume:
-                new_volume = min(1, max(0, new_volume))
-                Handler.session.SimpleAudioVolume.SetMasterVolume(new_volume, None)
-                Handler.app_volume = new_volume
+            new_volume = Handler.get_appropriate_app_volume(system_volume)
+            if new_volume == Handler.app_volume:
+                return
+            if DEBUGGING:
+                print(f"App volume changed, sys: {system_volume:%}, app: {new_volume:%}")
+            Handler.session.SimpleAudioVolume.SetMasterVolume(new_volume, None)
+            Handler.app_volume = new_volume
 
     @staticmethod
     def start() -> None:
-        notif_client = NotificationClient()
-        enumerator = AudioUtilities.GetDeviceEnumerator()
-        enumerator.RegisterEndpointNotificationCallback(notif_client)
+        """Listen to property changes, and hook the keyboard hotkey."""
+        Handler.notif_client = NotificationClient()
+        Handler.enumerator = AudioUtilities.GetDeviceEnumerator()
+        Handler.enumerator.RegisterEndpointNotificationCallback(Handler.notif_client)
         Handler.refresh_state()
+        Handler.start_hook()
+
+    @staticmethod
+    def stop() -> None:
+        """Stop listening to property changes, and unhook the keyboard hotkey."""
+        Handler.enumerator.UnregisterEndpointNotificationCallback(Handler.notif_client)
+        Handler.stop_hook()
+
+    @staticmethod
+    def start_hook() -> None:
+        """Perform post-setup actions, meant to be reassigned."""
+
+    @staticmethod
+    def stop_hook() -> None:
+        """Perform post-teardown actions, meant to be reassigned."""
 
 
 class NotificationClient(MMNotificationClient):
