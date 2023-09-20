@@ -6,6 +6,8 @@ from comtypes import CLSCTX_ALL, COMObject
 from pycaw.pycaw import IAudioEndpointVolume, IAudioEndpointVolumeCallback
 from pycaw.callbacks import MMNotificationClient
 from pycaw.utils import AudioUtilities
+from winutils._helpers import overlay
+import customtkinter as ctk
 
 DEBUGGING = False
 VOLUME_MAPPING = {
@@ -25,9 +27,32 @@ SYSTEM_VOLUMES = list(VOLUME_MAPPING.keys())
 APP_VOLUMES = list(VOLUME_MAPPING.values())
 INCREASE_HOTKEY = "ctrl+shift+alt+up"
 DECREASE_HOTKEY = "ctrl+shift+alt+down"
-MIN_SCALE_FACTOR = 0.1
+MIN_SCALE_FACTOR = 0
 MAX_SCALE_FACTOR = 2
 SCALE_FACTOR_STEP = 0.1
+OVERLAY_TIMEOUT = 2.5
+
+vol_overlay = overlay.BottomOverlay()
+vol_overlay.frame.rowconfigure(0, weight=1)
+vol_overlay.frame.columnconfigure(0, weight=1)
+vol_overlay.frame.columnconfigure(1, weight=8)
+vol_overlay.frame.columnconfigure(2, weight=1)
+
+volume_value_double = ctk.DoubleVar()
+volume_value_int = ctk.IntVar()
+
+volume_slider = ctk.CTkProgressBar(
+    vol_overlay.frame, variable=volume_value_double, width=0, height=5
+)
+volume_label = ctk.CTkLabel(vol_overlay.frame, textvariable=volume_value_int)
+volume_slider.grid(row=0, column=1, sticky="ew")
+volume_label.grid(row=0, column=2, sticky="nsew")
+
+
+def get_fg_slider_colour() -> str:
+    """Get the correct slider fg colour based on the system theme."""
+    mode = ctk.get_appearance_mode()
+    return "#000000" if mode == "Dark" else "#FFFFFF"
 
 
 def debounce(callback: t.Callable, fire_after: int) -> t.Callable:
@@ -72,24 +97,49 @@ class Handler:
     state_refresh_count = 0
     adjust_app_volume_count = 0
     scale_factor: float = 1
+    running = False
+
+    @staticmethod
+    def display_scaling() -> None:
+        """
+        Display the current volume scale.
+
+        We need to linearly interpolate the scale.
+        """
+        scale_range = MAX_SCALE_FACTOR - MIN_SCALE_FACTOR
+        interpolated_value = (Handler.scale_factor - MIN_SCALE_FACTOR) / scale_range
+        volume_value_int.set(round(interpolated_value * 100))
+        volume_value_double.set(interpolated_value)
+        volume_slider.configure(fg_color=get_fg_slider_colour())
+        vol_overlay.display(OVERLAY_TIMEOUT)
 
     @staticmethod
     def increment_scaling() -> None:
-        """Increment the scaling factor by 1 step."""
+        """
+        Increment the scaling factor by 1 step.
+
+        Also notify the user of the new scaling factor.
+        """
         Handler.scale_factor += SCALE_FACTOR_STEP
         Handler.scale_factor = max(MIN_SCALE_FACTOR, min(MAX_SCALE_FACTOR, Handler.scale_factor))
         if DEBUGGING:
             print(f"Incremented scaling factor to {Handler.scale_factor}")
         Handler.adjust_app_volume()
+        Handler.display_scaling()
 
     @staticmethod
     def decrement_scaling() -> None:
-        """Decrement the scaling factor by 1 step."""
+        """
+        Decrement the scaling factor by 1 step.
+
+        Also notify the user of the new scaling factor.
+        """
         Handler.scale_factor -= SCALE_FACTOR_STEP
         Handler.scale_factor = max(MIN_SCALE_FACTOR, min(MAX_SCALE_FACTOR, Handler.scale_factor))
         if DEBUGGING:
             print(f"Decremented scaling factor to {Handler.scale_factor}")
         Handler.adjust_app_volume()
+        Handler.display_scaling()
 
     @staticmethod
     def refresh_state() -> None:
@@ -171,6 +221,7 @@ class Handler:
     @staticmethod
     def start() -> None:
         """Listen to property changes, and hook the keyboard hotkey."""
+        Handler.running = True
         Handler.notif_client = NotificationClient()
         Handler.enumerator = AudioUtilities.GetDeviceEnumerator()
         Handler.enumerator.RegisterEndpointNotificationCallback(Handler.notif_client)
@@ -180,8 +231,17 @@ class Handler:
     @staticmethod
     def stop() -> None:
         """Stop listening to property changes, and unhook the keyboard hotkey."""
+        Handler.running = False
         Handler.enumerator.UnregisterEndpointNotificationCallback(Handler.notif_client)
         Handler.stop_hook()
+
+    @staticmethod
+    def toggle() -> None:
+        """Toggle the state of the application."""
+        if Handler.running:
+            Handler.stop()
+        else:
+            Handler.start()
 
     @staticmethod
     def start_hook() -> None:

@@ -1,2 +1,3 @@
 pycaw==20230407
 keyboard==0.13.5
+customtkinter==5.2.0
