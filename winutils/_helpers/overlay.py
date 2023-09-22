@@ -37,21 +37,24 @@ class BottomOverlay:
 
     def display(self, timeout: t.Optional[int] = None) -> None:
         """Display this overlay, with an optional timeout."""
-        if self._active_overlay is None:
+        if BottomOverlay._active_overlay is None:
             root.deiconify()
-        elif self is self._active_overlay:
+        elif self is BottomOverlay._active_overlay:
             root.after_cancel(self.hide_task)
         else:
-            self._active_overlay.hide()
+            BottomOverlay._active_overlay.hide(withdraw_root=False)
 
         self.frame.pack(fill=ctk.BOTH, expand=True)
-        self._active_overlay = self
+        BottomOverlay._active_overlay = self
         if timeout is not None:
-            self.hide_task = root.after(int(timeout * 1000), self.hide)
+            self.hide_task = root.after(int(timeout * 1000), self.hide, True)
 
-    def hide(self) -> None:
+    def hide(self, withdraw_root: bool) -> None:
         """Hide this overlay."""
-        root.withdraw()
+        if withdraw_root:
+            root.withdraw()
         self.frame.pack_forget()
-        self._active_overlay = None
+        BottomOverlay._active_overlay = None
+        if self.hide_task:
+            root.after_cancel(self.hide_task)
         self.hide_task = None
