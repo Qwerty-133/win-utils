@@ -1,5 +1,6 @@
 import typing as t
 import monitorcontrol
+import sys
 from winutils._helpers import overlay
 import customtkinter as ctk
 import keyboard
@@ -73,7 +74,7 @@ class Handler:
 
                 return
             else:
-                monitor.__exit__()
+                monitor.__exit__(*sys.exc_info())
 
         error_overlay.display(OVERLAY_TIMEOUT)
 
@@ -130,7 +131,7 @@ class Handler:
         """Stop listening to property changes, and unhook the keyboard hotkey."""
         Handler.running = False
         if Handler.monitor is not None:
-            Handler.monitor.__exit__()
+            Handler.monitor.__exit__(*sys.exc_info())
         Handler.monitor = None
         Handler.brightness = None
         Handler.cleanup_hooks()
