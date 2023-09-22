@@ -106,12 +106,12 @@ def initialize_hooks() -> None:
     Start all keyboard hooks, keeping in mind the suppression configuration.
     """
     if settings["suppressive_key_events"]:
-        Hooks.click_hotkey = keyboard.add_hotkey(CLICK_HOTKEY, invoke_click)
-        Hooks.rain_hotkey = keyboard.add_hotkey(RAIN_HOTKEY, invoke_rainmeter)
-    else:
         Hooks.fn_hook = keyboard.hook(fn_core.handle_events, suppress=True)
         Hooks.click_hotkey = keyboard.add_hotkey(CLICK_HOTKEY, invoke_click, suppress=True)
         Hooks.rain_hotkey = keyboard.add_hotkey(RAIN_HOTKEY, invoke_rainmeter, suppress=True)
+    else:
+        Hooks.click_hotkey = keyboard.add_hotkey(CLICK_HOTKEY, invoke_click)
+        Hooks.rain_hotkey = keyboard.add_hotkey(RAIN_HOTKEY, invoke_rainmeter)
 
 
 def change_key_supression() -> None:
@@ -143,7 +143,7 @@ def change_key_supression() -> None:
 def teardown_app() -> None:
     """Teardown the application."""
     tray_icon.stop()
-    overlay.root.destroy()
+    overlay.root.after(1, overlay.root.destroy)
 
 
 CONFIG_PATH.mkdir(parents=True, exist_ok=True)
