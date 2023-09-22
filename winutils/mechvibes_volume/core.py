@@ -159,6 +159,7 @@ class Handler:
         # Handler.volume.RegisterControlChangeNotify(AudioEndpointVolumeCallback())
         Handler.adjust_app_volume()
 
+    @staticmethod
     def get_appropriate_app_volume(system_volume: float) -> float:
         """
         Get the appropriate app volume based on the system volume.
