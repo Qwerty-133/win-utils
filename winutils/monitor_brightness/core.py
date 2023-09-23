@@ -11,24 +11,24 @@ BRIGHTNESS_STEP = 5
 OVERLAY_TIMEOUT = 2.5
 
 info_overlay = overlay.BottomOverlay()
-info_overlay.frame.rowconfigure(0, weight=1)
-info_overlay.frame.columnconfigure(0, weight=1)
-info_overlay.frame.columnconfigure(1, weight=8)
-info_overlay.frame.columnconfigure(2, weight=1)
+info_overlay.frame.rowconfigure(0, weight=1, uniform="a")
+info_overlay.frame.columnconfigure(0, weight=1, uniform="a")
+info_overlay.frame.columnconfigure(1, weight=3, uniform="a")
+info_overlay.frame.columnconfigure(2, weight=1, uniform="a")
 
 brightness_double = ctk.DoubleVar()
 brightness_int = ctk.IntVar()
 
 brightness_slider = ctk.CTkProgressBar(
-    info_overlay.frame, variable=brightness_double, width=0, height=5
+    info_overlay.frame, variable=brightness_double, width=0, height=5,
 )
 brightness_label = ctk.CTkLabel(info_overlay.frame, textvariable=brightness_int)
 brightness_slider.grid(row=0, column=1, sticky="ew")
-brightness_label.grid(row=0, column=2, sticky="nsew")
+brightness_label.grid(row=0, column=2, sticky="ew")
 
 error_overlay = overlay.BottomOverlay()
 error_label = ctk.CTkLabel(error_overlay.frame, text="No monitors connected.")
-error_label.pack(expand=True, fill=ctk.BOTH)
+error_label.pack(expand=True)
 
 
 def get_fg_slider_colour() -> str:

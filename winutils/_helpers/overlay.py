@@ -1,10 +1,12 @@
 import typing as t
 import customtkinter as ctk
 
+TRANSPARENT_COLOUR = "#000001"
+
 root = ctk.CTk()
 root.overrideredirect(True)
 root.withdraw()
-root.wm_attributes("-transparentcolor", "#000001")
+root.wm_attributes("-transparentcolor", TRANSPARENT_COLOUR)
 root.wm_attributes("-topmost", True)
 root.resizable(False, False)
 root.lift()
@@ -33,7 +35,7 @@ class BottomOverlay:
     _active_overlay: t.Optional["BottomOverlay"] = None
 
     def __init__(self) -> None:
-        self.frame = ctk.CTkFrame(root, bg_color="#000001")
+        self.frame = ctk.CTkFrame(root, bg_color=TRANSPARENT_COLOUR)
 
     def display(self, timeout: t.Optional[int] = None) -> None:
         """Display this overlay, with an optional timeout."""

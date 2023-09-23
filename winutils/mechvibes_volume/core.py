@@ -33,10 +33,10 @@ SCALE_FACTOR_STEP = 0.1
 OVERLAY_TIMEOUT = 2.5
 
 vol_overlay = overlay.BottomOverlay()
-vol_overlay.frame.rowconfigure(0, weight=1)
-vol_overlay.frame.columnconfigure(0, weight=1)
-vol_overlay.frame.columnconfigure(1, weight=8)
-vol_overlay.frame.columnconfigure(2, weight=1)
+vol_overlay.frame.rowconfigure(0, weight=1, uniform="a")
+vol_overlay.frame.columnconfigure(0, weight=1, uniform="a")
+vol_overlay.frame.columnconfigure(1, weight=3, uniform="a")
+vol_overlay.frame.columnconfigure(2, weight=1, uniform="a")
 
 volume_value_double = ctk.DoubleVar()
 volume_value_int = ctk.IntVar()
@@ -46,7 +46,7 @@ volume_slider = ctk.CTkProgressBar(
 )
 volume_label = ctk.CTkLabel(vol_overlay.frame, textvariable=volume_value_int)
 volume_slider.grid(row=0, column=1, sticky="ew")
-volume_label.grid(row=0, column=2, sticky="nsew")
+volume_label.grid(row=0, column=2, sticky="ew")
 
 
 def get_fg_slider_colour() -> str:
