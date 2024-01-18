@@ -8,3 +8,4 @@ Pillow==10.0.0
 keyboard==0.13.5
 customtkinter==5.2.0
 monitorcontrol==3.0.3
+pycaw==20230407
