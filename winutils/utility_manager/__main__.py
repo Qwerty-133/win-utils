@@ -215,4 +215,8 @@ menu = pystray.Menu(
 )
 tray_icon = pystray.Icon("Winutils", icon=icon, menu=menu)
 tray_icon.run_detached()
-overlay.root.mainloop()
+
+try:
+    overlay.root.mainloop()
+except KeyboardInterrupt:
+    teardown_app()
