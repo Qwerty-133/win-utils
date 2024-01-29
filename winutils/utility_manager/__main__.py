@@ -19,14 +19,27 @@ from winutils.toggle_rainmeter import core as rain_core
 from winutils.toggle_click import core as click_core
 from winutils.mechvibes_volume import core as mech_core
 from winutils.monitor_brightness import core as monitor_core
+from winutils.clear_ram import core as clear_ram_core
 from winutils._helpers import path, overlay
 from PIL import Image
 
 ICON_PATH = path.ICON_DIR / "settings.ico"
 CLICK_HOTKEY = "ctrl+alt+shift+c"
 RAIN_HOTKEY = "ctrl+alt+shift+r"
+RAM_HOTKEY = "ctrl+alt+shift+t"
 CONFIG_PATH = platformdirs.user_config_path("Winutils", appauthor=False)
 SETTINGS_PATH = CONFIG_PATH / "settings.json"
+
+ram_next_action_is_quit = True
+
+def invoke_ram_toggle() -> None:
+    """Run the clear ram tool."""
+    global ram_next_action_is_quit
+    if ram_next_action_is_quit:
+        clear_ram_core.quit_apps()
+    else:
+        clear_ram_core.start_apps()
+    ram_next_action_is_quit = not ram_next_action_is_quit
 
 
 def invoke_click() -> None:
@@ -97,6 +110,7 @@ class Hooks:
     fn_hook = None
     click_hotkey = None
     rain_hotkey = None
+    ram_hotkey = None
     increase_mech_hotkey = None
     decrease_mech_hotkey = None
 
@@ -109,9 +123,11 @@ def initialize_hooks() -> None:
         Hooks.fn_hook = keyboard.hook(fn_core.handle_events, suppress=True)
         Hooks.click_hotkey = keyboard.add_hotkey(CLICK_HOTKEY, invoke_click, suppress=True)
         Hooks.rain_hotkey = keyboard.add_hotkey(RAIN_HOTKEY, invoke_rainmeter, suppress=True)
+        Hooks.ram_hotkey = keyboard.add_hotkey(RAM_HOTKEY, invoke_ram_toggle, suppress=True)
     else:
         Hooks.click_hotkey = keyboard.add_hotkey(CLICK_HOTKEY, invoke_click)
         Hooks.rain_hotkey = keyboard.add_hotkey(RAIN_HOTKEY, invoke_rainmeter)
+        Hooks.ram_hotkey = keyboard.add_hotkey(RAM_HOTKEY, invoke_ram_toggle)
 
 
 def change_key_supression() -> None:
@@ -130,6 +146,8 @@ def change_key_supression() -> None:
     Hooks.click_hotkey = None
     keyboard.remove_hotkey(Hooks.rain_hotkey)
     Hooks.rain_hotkey = None
+    keyboard.remove_hotkey(Hooks.ram_hotkey)
+    Hooks.ram_hotkey = None
 
     if settings["mechvibes_enabled"]:
         mech_stop_hook()
@@ -196,6 +214,9 @@ monitor_item = pystray.MenuItem(
     checked=lambda item: monitor_core.Handler.running,
 )
 
+quit_apps_item = pystray.MenuItem("Quit target apps", clear_ram_core.quit_apps)
+start_apps_item = pystray.MenuItem("Start target apps", clear_ram_core.start_apps)
+
 suppress_item = pystray.MenuItem(
     "Use suppressive events",
     change_key_supression,
@@ -209,6 +230,9 @@ menu = pystray.Menu(
     fn_lock_item,
     mechvibes_item,
     monitor_item,
+    pystray.Menu.SEPARATOR,
+    start_apps_item,
+    quit_apps_item,
     pystray.Menu.SEPARATOR,
     suppress_item,
     quit_item,
