@@ -14,11 +14,11 @@ import keyboard
 import pystray
 import json
 import platformdirs
-from winutils.fn_lock import core as fn_core
-from winutils.toggle_rainmeter import core as rain_core
+# from winutils.fn_lock import core as fn_core
+# from winutils.toggle_rainmeter import core as rain_core
 from winutils.toggle_click import core as click_core
-from winutils.mechvibes_volume import core as mech_core
-from winutils.monitor_brightness import core as monitor_core
+# from winutils.mechvibes_volume import core as mech_core
+# from winutils.monitor_brightness import core as monitor_core
 from winutils.clear_ram import core as clear_ram_core
 from winutils._helpers import path, overlay
 from PIL import Image
@@ -126,7 +126,7 @@ def initialize_hooks() -> None:
         Hooks.ram_hotkey = keyboard.add_hotkey(RAM_HOTKEY, invoke_ram_toggle, suppress=True)
     else:
         Hooks.click_hotkey = keyboard.add_hotkey(CLICK_HOTKEY, invoke_click)
-        Hooks.rain_hotkey = keyboard.add_hotkey(RAIN_HOTKEY, invoke_rainmeter)
+        # Hooks.rain_hotkey = keyboard.add_hotkey(RAIN_HOTKEY, invoke_rainmeter)
         Hooks.ram_hotkey = keyboard.add_hotkey(RAM_HOTKEY, invoke_ram_toggle)
 
 
@@ -144,8 +144,8 @@ def change_key_supression() -> None:
         Hooks.fn_hook = None
     keyboard.remove_hotkey(Hooks.click_hotkey)
     Hooks.click_hotkey = None
-    keyboard.remove_hotkey(Hooks.rain_hotkey)
-    Hooks.rain_hotkey = None
+    # keyboard.remove_hotkey(Hooks.rain_hotkey)
+    # Hooks.rain_hotkey = None
     keyboard.remove_hotkey(Hooks.ram_hotkey)
     Hooks.ram_hotkey = None
 
@@ -167,11 +167,11 @@ def teardown_app() -> None:
 CONFIG_PATH.mkdir(parents=True, exist_ok=True)
 SETTINGS_PATH.touch(exist_ok=True)
 
-original_toggle_enabled = fn_core.toggle_enabled
-fn_core.toggle_enabled = toggle_enabled
+# original_toggle_enabled = fn_core.toggle_enabled
+# fn_core.toggle_enabled = toggle_enabled
 
-mech_core.Handler.start_hook = mech_start_hook
-mech_core.Handler.stop_hook = mech_stop_hook
+# mech_core.Handler.start_hook = mech_start_hook
+# mech_core.Handler.stop_hook = mech_stop_hook
 
 settings_string = SETTINGS_PATH.read_text()
 if settings_string:
@@ -187,7 +187,7 @@ if settings["mechvibes_enabled"]:
     mech_core.Handler.start()
 if settings["monitor_brightness_enabled"]:
     monitor_core.Handler.start(suppress=settings["suppressive_key_events"])
-fn_core.State.enabled = settings["fn_lock_enabled"]
+# fn_core.State.enabled = settings["fn_lock_enabled"]
 
 initialize_hooks()
 
@@ -195,52 +195,52 @@ icon = Image.open(ICON_PATH)
 icon.size = (64, 64)
 
 click_item = pystray.MenuItem("Swap mouse buttons", invoke_click)
-rain_item = pystray.MenuItem("Toggle Rainmeter colours", invoke_rainmeter)
-fn_lock_item = pystray.MenuItem(
-    "Fn Lock",
-    original_toggle_enabled,
-    checked=lambda item: fn_core.State.enabled,
-    enabled=lambda item: settings["suppressive_key_events"],
-)
-fn_lock_item
-mechvibes_item = pystray.MenuItem(
-    "Mechvibes stable audio",
-    mech_core.Handler.toggle,
-    checked=lambda item: mech_core.Handler.running,
-)
-monitor_item = pystray.MenuItem(
-    "Monitor brightness",
-    toggle_monitor_brightness,
-    checked=lambda item: monitor_core.Handler.running,
-)
+# rain_item = pystray.MenuItem("Toggle Rainmeter colours", invoke_rainmeter)
+# fn_lock_item = pystray.MenuItem(
+#     "Fn Lock",
+#     original_toggle_enabled,
+#     checked=lambda item: fn_core.State.enabled,
+#     enabled=lambda item: settings["suppressive_key_events"],
+# )
+# fn_lock_item
+# mechvibes_item = pystray.MenuItem(
+#     "Mechvibes stable audio",
+#     mech_core.Handler.toggle,
+#     checked=lambda item: mech_core.Handler.running,
+# )
+# monitor_item = pystray.MenuItem(
+#     "Monitor brightness",
+#     toggle_monitor_brightness,
+#     checked=lambda item: monitor_core.Handler.running,
+# )
 
 quit_apps_item = pystray.MenuItem("Quit target apps", clear_ram_core.quit_apps)
 start_apps_item = pystray.MenuItem("Start target apps", clear_ram_core.start_apps)
 
-suppress_item = pystray.MenuItem(
-    "Use suppressive events",
-    change_key_supression,
-    checked=lambda item: settings["suppressive_key_events"],
-)
+# suppress_item = pystray.MenuItem(
+#     "Use suppressive events",
+#     change_key_supression,
+#     checked=lambda item: settings["suppressive_key_events"],
+# )
 quit_item = pystray.MenuItem("Quit", teardown_app)
 
 menu = pystray.Menu(
     click_item,
-    rain_item,
-    fn_lock_item,
-    mechvibes_item,
-    monitor_item,
+    # rain_item,
+    # fn_lock_item,
+    # mechvibes_item,
+    # monitor_item,
     pystray.Menu.SEPARATOR,
     start_apps_item,
     quit_apps_item,
     pystray.Menu.SEPARATOR,
-    suppress_item,
+    # suppress_item,
     quit_item,
 )
 tray_icon = pystray.Icon("Winutils", icon=icon, menu=menu)
-tray_icon.run_detached()
+tray_icon.run()
 
-try:
-    overlay.root.mainloop()
-except KeyboardInterrupt:
-    teardown_app()
+# try:
+#     overlay.root.mainloop()
+# except KeyboardInterrupt:
+#     teardown_app()
