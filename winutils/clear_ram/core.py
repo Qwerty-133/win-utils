@@ -39,9 +39,10 @@ def quit_apps():
         exe_path = pathlib.Path(exe)
         if any(exe_path == executable for executable in quit_targets):
             process.terminate()
+            terminated.append(process)
 
     toast.show_toast(
-        "Apps quit", f"Terminated {len(terminated)} apps.", ICON_NAME, "Clear RAM"
+        "Apps quit", f"Terminated {len(terminated)} apps.", toast.get_icon(ICON_NAME), "Clear RAM"
     )
 
 
@@ -59,4 +60,4 @@ def start_apps():
     else:
         message = f"Started {len(start_targets)} apps."
 
-    toast.show_toast("Apps started", message, ICON_NAME, "Clear RAM")
+    toast.show_toast("Apps started", message, toast.get_icon(ICON_NAME), "Clear RAM")
