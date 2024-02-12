@@ -20,7 +20,7 @@ from winutils.toggle_click import core as click_core
 # from winutils.mechvibes_volume import core as mech_core
 # from winutils.monitor_brightness import core as monitor_core
 from winutils.clear_ram import core as clear_ram_core
-from winutils._helpers import path, overlay
+from winutils._helpers import path
 from PIL import Image
 
 ICON_PATH = path.ICON_DIR / "settings.ico"
@@ -161,7 +161,7 @@ def change_key_supression() -> None:
 def teardown_app() -> None:
     """Teardown the application."""
     tray_icon.stop()
-    overlay.root.after(1, overlay.root.destroy)
+    # overlay.root.after(1, overlay.root.destroy)
 
 
 CONFIG_PATH.mkdir(parents=True, exist_ok=True)
