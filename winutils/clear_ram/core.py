@@ -7,17 +7,13 @@ import platformdirs
 import os
 
 ICON_NAME = "task.ico"
-EXECUTABLE_ENTRIES_PATH = (
-    platformdirs.user_documents_path() / "winutils_executables.txt"
-)
+EXECUTABLE_ENTRIES_PATH = platformdirs.user_documents_path() / "winutils_executables.txt"
 quit_targets = []
 start_targets = []
 
 with open(EXECUTABLE_ENTRIES_PATH) as f:
     for line in f:
-        quit_target, start_target, startup_args = [
-            part.strip() for part in line.split(";")
-        ]
+        quit_target, start_target, startup_args = [part.strip() for part in line.split(";")]
         if not start_target:
             start_target = quit_target
 
@@ -41,9 +37,7 @@ def quit_apps():
             process.terminate()
             terminated.append(process)
 
-    toast.show_toast(
-        "Apps quit", f"Terminated {len(terminated)} apps.", toast.get_icon(ICON_NAME)
-    )
+    toast.show_toast("Apps quit", f"Terminated {len(terminated)} apps.", toast.get_icon(ICON_NAME))
 
 
 def start_apps():

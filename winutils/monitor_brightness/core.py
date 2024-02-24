@@ -20,7 +20,10 @@ brightness_double = ctk.DoubleVar()
 brightness_int = ctk.IntVar()
 
 brightness_slider = ctk.CTkProgressBar(
-    info_overlay.frame, variable=brightness_double, width=0, height=5,
+    info_overlay.frame,
+    variable=brightness_double,
+    width=0,
+    height=5,
 )
 brightness_label = ctk.CTkLabel(info_overlay.frame, textvariable=brightness_int)
 brightness_slider.grid(row=0, column=1, sticky="ew")

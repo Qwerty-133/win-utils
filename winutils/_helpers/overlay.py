@@ -42,7 +42,6 @@ class BottomOverlay:
         y_pos = screen_y - bottom_gap - widget_height
         root.geometry(f"{width}x{widget_height}+{x_pos}+{y_pos}")
 
-
     def display(self, timeout: t.Optional[int] = None) -> None:
         """Display this overlay, with an optional timeout."""
         if BottomOverlay._active_overlay is None:

@@ -71,7 +71,5 @@ def notify_state(is_white: bool) -> None:
     """Display a toast about the current skin colour being used."""
     current_theme = "white" if is_white else "black"
     toast.show_toast(
-        "Rainmeter",
-        f"Toggled skin colours, currently {current_theme}.",
-        toast.get_icon(ICON_NAME)
+        "Rainmeter", f"Toggled skin colours, currently {current_theme}.", toast.get_icon(ICON_NAME)
     )

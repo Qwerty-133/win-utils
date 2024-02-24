@@ -32,6 +32,7 @@ SETTINGS_PATH = CONFIG_PATH / "settings.json"
 
 ram_next_action_is_quit = True
 
+
 def invoke_ram_toggle() -> None:
     """Run the clear ram tool."""
     global ram_next_action_is_quit

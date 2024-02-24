@@ -28,6 +28,6 @@ for theme_file in theme_files:
 toast.show_toast(
     "Theme wallpapers edited!",
     "The wallpapers for the Light and Dark themes have been edited.",
-    toast.get_icon(ICON_NAME)
+    toast.get_icon(ICON_NAME),
 )
 toast.wait_for_toast_completion()
