@@ -42,7 +42,7 @@ def quit_apps():
             terminated.append(process)
 
     toast.show_toast(
-        "Apps quit", f"Terminated {len(terminated)} apps.", toast.get_icon(ICON_NAME), "Clear RAM"
+        "Apps quit", f"Terminated {len(terminated)} apps.", toast.get_icon(ICON_NAME)
     )
 
 
@@ -60,4 +60,4 @@ def start_apps():
     else:
         message = f"Started {len(start_targets)} apps."
 
-    toast.show_toast("Apps started", message, toast.get_icon(ICON_NAME), "Clear RAM")
+    toast.show_toast("Apps started", message, toast.get_icon(ICON_NAME))

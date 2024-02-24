@@ -73,6 +73,5 @@ def notify_state(is_white: bool) -> None:
     toast.show_toast(
         "Rainmeter",
         f"Toggled skin colours, currently {current_theme}.",
-        toast.get_icon(ICON_NAME),
-        "Toggle Rainmeter",
+        toast.get_icon(ICON_NAME)
     )

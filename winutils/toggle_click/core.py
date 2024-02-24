@@ -22,6 +22,5 @@ def notify_state(state: int) -> None:
     toast.show_toast(
         "Mouse buttons swapped",
         f"The primary mouse button is now the {state_repr} button.",
-        toast.get_icon(ICON_NAME),
-        "Toggle Click",
+        toast.get_icon(ICON_NAME)
     )
