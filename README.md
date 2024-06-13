@@ -27,7 +27,6 @@ The README of [each tool subdirectory](winutils/) has more information on each p
 ![Monitor Brightness](assets/demos/Monitor%20Brightness.gif)
 ![Tray Tool](assets/demos/Tray%20Tool.png)
 
-
 ## Utility List
 
 - [App Runner](winutils/clear_ram/): Stop and start certain application groups with a single click
@@ -40,6 +39,13 @@ The README of [each tool subdirectory](winutils/) has more information on each p
 - [Toggle Rainmeter Skin](winutils/toggle_rainmeter/): Switch between light and dark Rainmeter skins
 - [Utility Manager](winutils/utility_manager/): A tray tool to access all the various utilities
 
+## Script List
+
+This repository also contains a few standalone scripts that are not part of the tray tool.
+
+- [Backup Bitwarden](scripts/backup_bitwarden.py): Maintain up to 5 encrypted Bitwarden backups
+- [Create Symlinks](scripts/create_symlinks.py): Create symlinks as per a config file to particular directories
+- [WinGet App Installer](scripts/winget_bulk_installer.py): Bulk install apps as per a config file using WinGet
 
 ## Building
 
